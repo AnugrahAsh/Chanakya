@@ -1,16 +1,25 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Landing from "./pages/Landing";
+import About from "./pages/About";
+// import Contact from "./pages/Contact";
+// import NotFound from "./pages/NotFound";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div className='text-blue-500 text-3xl'>Hello</div>
-    </>
-  )
+    <BrowserRouter>
+      <Routes>
+        {/* Home route */}
+        <Route path="/" element={<Landing />} />
+
+        {/* Static routes */}
+        <Route path="/about" element={<About />} />
+        {/* <Route path="/contact" element={<Contact />} /> */}
+
+        {/* Catch-all for 404 */}
+        {/* <Route path="*" element={<NotFound />} /> */}
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
