@@ -1,297 +1,429 @@
-import React, { useRef, Suspense, useState, useLayoutEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
-import { TorusKnot } from '@react-three/drei';
+"use client"
 
-const Model = () => {
-  const meshRef = useRef();
-  const { viewport } = useThree();
+import { useRef, Suspense, useState, useLayoutEffect } from "react"
+import { Canvas, useFrame, useThree } from "@react-three/fiber"
+import { motion, useScroll, useTransform, useSpring } from "framer-motion"
+import * as THREE from "three"
 
-  // Rotate the model on each frame for a constant dynamic effect.
-  useFrame((state, delta) => {
+const FloatingElement = ({ position, rotation, scale = 1, color, shape = "sphere" }) => {
+  const meshRef = useRef()
+
+  useFrame((state) => {
     if (meshRef.current) {
-      meshRef.current.rotation.x += delta * 0.1;
-      meshRef.current.rotation.y += delta * 0.15;
+      meshRef.current.rotation.x += 0.005
+      meshRef.current.rotation.y += 0.01
+      meshRef.current.position.y += Math.sin(state.clock.elapsedTime + position[0]) * 0.002
     }
-  });
-
-  // useScroll hook without a target defaults to window scroll, which is what we want.
-  const { scrollYProgress } = useScroll();
-  
-  // Transform scroll progress into animation values for the model.
-  // The model will scale up and then back down as the user scrolls.
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.5, 1]);
-  // The model moves up slightly as the user scrolls down.
-  const positionY = useTransform(scrollYProgress, [0, 1], [0, -viewport.height / 4]);
+  })
 
   return (
-    // Using motion.group to apply framer-motion transforms to the 3D object.
-    <motion.group ref={meshRef} scale={scale} position-y={positionY}>
-      <TorusKnot args={[1, 0.3, 256, 32]}>
-        <meshStandardMaterial 
-          color="#4F46E5" 
-          emissive="#A855F7" 
-          emissiveIntensity={0.5} 
-          metalness={0.8} 
-          roughness={0.2} 
-        />
-      </TorusKnot>
-    </motion.group>
-  );
-};
+    <group position={position} rotation={rotation} scale={scale}>
+      <mesh ref={meshRef}>
+        {shape === "sphere" && <sphereGeometry args={[1, 32, 32]} />}
+        {shape === "torus" && <torusGeometry args={[1, 0.4, 16, 100]} />}
+        {shape === "cylinder" && <cylinderGeometry args={[0.8, 0.8, 2, 32]} />}
+        <meshStandardMaterial color={color} metalness={0.3} roughness={0.2} transparent opacity={0.9} />
+      </mesh>
+    </group>
+  )
+}
 
-// Main App Component
+const HeroScene = () => {
+  const { mouse } = useThree()
+  const groupRef = useRef()
+
+  useFrame(() => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, mouse.x * 0.1, 0.05)
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -mouse.y * 0.1, 0.05)
+    }
+  })
+
+  return (
+    <group ref={groupRef}>
+      {/* Large blue spherical elements */}
+      <FloatingElement position={[4, 2, -2]} color="#1e40af" scale={1.5} shape="sphere" />
+      <FloatingElement position={[6, -1, -1]} color="#3b82f6" scale={1.2} shape="torus" />
+      <FloatingElement position={[-4, 1, -3]} color="#60a5fa" scale={1} shape="cylinder" />
+      <FloatingElement position={[2, -2, 0]} color="#93c5fd" scale={0.8} shape="sphere" />
+    </group>
+  )
+}
+
+const Header = () => (
+  <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md">
+    <div className="container mx-auto px-6 py-4">
+      <nav className="flex items-center justify-between">
+        <div className="text-2xl font-bold p-4 isolate ">Chanakya</div>
+        <div className="hidden md:flex items-center space-x-1 isolate rounded-xl bg-white/20 shadow-lg ring-1 ring-black/5 py-2 px-3">
+          <a
+            href="#"
+            className="hover:bg-white text-black transition-all px-4 py-2 rounded-full text-sm font-medium"
+          >
+            Startups
+          </a>
+          <a
+            href="#"
+            className="hover:bg-white text-black transition-all px-4 py-2 rounded-full text-sm font-medium"
+          >
+            Established Products
+          </a>
+          <a
+            href="#"
+            className="hover:bg-white text-black transition-all px-4 py-2 rounded-full text-sm font-medium"
+          >
+            Features ↓
+          </a>
+          <a
+            href="#"
+            className="hover:bg-white text-black transition-all px-4 py-2 rounded-full text-sm font-medium"
+          >
+            Pricing
+          </a>
+          <a
+            href="#"
+            className="hover:bg-white text-black transition-all px-4 py-2 rounded-full text-sm font-medium"
+          >
+            Investors
+          </a>
+          <a
+            href="#"
+            className="hover:bg-white text-black transition-all px-4 py-2 rounded-full text-sm font-medium"
+          >
+            Request Demo
+          </a>
+        </div>
+        <div className="flex items-center space-x-3">
+          
+          <button className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-6 rounded-full transition text-sm">
+            Sign Up
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+)
+
+const AIDomains = () => {
+  const domains = ["Legal Advisory", "Financial Guidance", "Marketing Support", "Technical Analysis", "UI/UX Insights"]
+
+  return (
+    <div className="absolute bottom-8 left-0 right-0 z-10">
+      <div className="container mx-auto px-6">
+        <div className="flex items-center justify-center space-x-8 opacity-80">
+          {domains.map((domain, index) => (
+            <div key={index} className="text-black font-medium text-sm whitespace-nowrap">
+              {domain}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+import herobg from '../assets/HeroBg.jpg'
+
 export default function App() {
-  const contentRef = useRef(null);
-  const [contentHeight, setContentHeight] = useState(0);
+  const contentRef = useRef(null)
+  const [contentHeight, setContentHeight] = useState(0)
 
-  // This effect measures the height of the content and sets it.
-  // This is crucial for the spacer div to create a functional scrollbar.
   useLayoutEffect(() => {
     const onResize = () => {
       if (contentRef.current) {
-        setContentHeight(contentRef.current.scrollHeight);
+        setContentHeight(contentRef.current.scrollHeight)
       }
-    };
+    }
+    const debouncedOnResize = () => setTimeout(onResize, 100)
+    onResize()
+    window.addEventListener("resize", debouncedOnResize)
+    return () => window.removeEventListener("resize", debouncedOnResize)
+  }, [])
 
-    onResize();
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
+  const { scrollY } = useScroll()
+  const smoothScrollY = useSpring(scrollY, { mass: 0.1, stiffness: 100, damping: 20, restDelta: 0.001 })
+  const y = useTransform(smoothScrollY, (value) => `-${value}px`)
 
-  const { scrollY } = useScroll();
-
-  // Apply spring physics to the scrollY value for the inertia effect.
-  // These values can be tweaked to change the feel of the scroll.
-  const smoothScrollY = useSpring(scrollY, {
-    mass: 0.1,
-    stiffness: 100,
-    damping: 20,
-    restDelta: 0.001,
-  });
-
-  // Transform the smoothed scroll value into a negative translateY to move the content up.
-  const y = useTransform(smoothScrollY, value => `-${value}px`);
-
-  // Variants for Framer Motion's staggered fade-up animations.
   const fadeInUp = {
     initial: { opacity: 0, y: 30 },
-    animate: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
-  };
+    animate: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
+  }
 
   return (
     <>
-      <div className="bg-[#0A0A0A] text-[#E0E0E0] font-sans antialiased overflow-x-hidden">
-        {/* 3D Canvas remains fixed in the background */}
-        <div className="fixed top-0 left-0 w-full h-screen z-0 opacity-40">
-          <Canvas camera={{ position: [0, 0, 5], fov: 50 }}>
-            <ambientLight intensity={0.5} />
-            <pointLight position={[10, 10, 10]} intensity={1.5} />
-            <Suspense fallback={null}>
-              <Model />
-            </Suspense>
-          </Canvas>
-        </div>
-        
-        {/* This spacer div creates the scrollable height, allowing the native scrollbar to work. */}
+      <div className="bg-white text-black font-sans antialiased">
         <div style={{ height: contentHeight }} />
-
-        {/* The main content is in a fixed motion.div. Its 'y' position is animated for the smooth scroll effect. */}
-        <motion.div
-          ref={contentRef}
-          style={{ y }}
-          className="fixed top-0 left-0 w-full will-change-transform"
-        >
-          {/* Header */}
-          <header className="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-md">
-            <div className="container mx-auto px-6 py-4">
-              <nav className="flex items-center justify-between">
-                <div className="text-2xl font-bold text-white">Synthara</div>
-                <div className="hidden md:flex items-center space-x-8">
-                  <a href="#" className="text-gray-300 hover:text-white transition">Products</a>
-                  <a href="#" className="text-gray-300 hover:text-white transition">Solutions</a>
-                  <a href="#" className="text-gray-300 hover:text-white transition">Developers</a>
-                  <a href="#" className="text-gray-300 hover:text-white transition">Company</a>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <a href="#" className="hidden md:block text-gray-300 hover:text-white transition">Contact Sales</a>
-                  <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-5 rounded-lg transition">
-                    Dashboard
-                  </button>
-                </div>
-              </nav>
-            </div>
-          </header>
-
+        <motion.div ref={contentRef} style={{ y }} className="fixed top-0 left-0 w-full will-change-transform">
+          <Header />
           <main>
-            {/* Hero Section */}
-            <section className="min-h-screen flex items-center justify-center text-center relative pt-40 pb-20" style={{ background: 'radial-gradient(ellipse at top, rgba(79, 70, 229, 0.2) 0%, rgba(10, 10, 10, 0) 50%)' }}>
-              <div className="container mx-auto px-6">
-                <motion.div 
-                  className="max-w-4xl mx-auto"
+            <section
+              className="min-h-screen flex items-center relative overflow-hidden"
+            >
+              {/* This div holds the background image, which is semi-transparent to blend with the gradient */}
+              <div className="absolute inset-0 z-0">
+                <img 
+                  src={herobg} 
+                  alt="Abstract AI visualization" 
+                  className="w-full h-full object-cover opacity-20"
+                  // Fallback in case the image fails to load
+                  onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/1920x1080/1e40ae/ffffff?text=Chanakya'; }}
+                />
+              </div>
+
+              <div className="container mx-auto px-6 mt-10 ml-6 z-10">
+                <motion.div
+                  className="max-w-3xl"
                   initial="initial"
                   animate="animate"
                   variants={{ animate: { transition: { staggerChildren: 0.15 } } }}
                 >
-                  <motion.h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-6" variants={fadeInUp}>
-                    The Complete <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500">Web3 Infrastructure</span> for Global Access
+                  <motion.h1
+                    className="text-5xl sm:text-7xl md:text-8xl font-bold text-black/90 leading-tight mb-8"
+                    variants={fadeInUp}
+                  >
+                    AI-Powered Product Refinement.
                   </motion.h1>
-                  <motion.p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-10" variants={fadeInUp}>
-                    Synthara provides seamless, compliant, and powerful fiat-to-crypto on-ramps, off-ramps, and NFT checkout solutions for any application.
+                  <motion.p className="text-lg sm:text-xl text-black/90 mb-8 max-w-lg" variants={fadeInUp}>
+                    Optimize, refine, and grow your offering with AI-driven insights, analytics, and practical guidance for every stage of your business.
                   </motion.p>
-                  <motion.div className="flex justify-center items-center gap-4" variants={fadeInUp}>
-                    <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg transition text-lg">
-                      Get Started
-                    </button>
-                    <button className="bg-gray-700/50 hover:bg-gray-600/50 border border-gray-600 text-white font-bold py-3 px-8 rounded-lg transition text-lg">
-                      View Docs
-                    </button>
-                  </motion.div>
                 </motion.div>
               </div>
+              <AIDomains />
             </section>
 
-            {/* Partners Section */}
-            <motion.section 
-              className="py-12"
-              initial={{opacity: 0}}
-              whileInView={{opacity: 1}}
-              viewport={{ once: true, amount: 0.5 }}
-              transition={{duration: 0.8}}
-            >
-              <div className="container mx-auto px-6 text-center">
-                <p className="text-gray-400 font-medium mb-6">TRUSTED BY INDUSTRY LEADERS</p>
-                <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-6">
-                  <img src="https://placehold.co/120x40/0A0A0A/E0E0E0?text=Partner1" alt="Partner 1" className="h-8 opacity-60 hover:opacity-100 transition" />
-                  <img src="https://placehold.co/120x40/0A0A0A/E0E0E0?text=Partner2" alt="Partner 2" className="h-8 opacity-60 hover:opacity-100 transition" />
-                  <img src="https://placehold.co/120x40/0A0A0A/E0E0E0?text=Partner3" alt="Partner 3" className="h-8 opacity-60 hover:opacity-100 transition" />
-                  <img src="https://placehold.co/120x40/0A0A0A/E0E0E0?text=Partner4" alt="Partner 4" className="h-8 opacity-60 hover:opacity-100 transition" />
-                  <img src="https://placehold.co/120x40/0A0A0A/E0E0E0?text=Partner5" alt="Partner 5" className="h-8 opacity-60 hover:opacity-100 transition" />
-                </div>
-              </div>
-            </motion.section>
-
-            {/* Features Section */}
-            <section className="py-20">
+            <section className="py-20 bg-gray-50">
               <div className="container mx-auto px-6">
                 <div className="text-center max-w-3xl mx-auto mb-16">
-                  <motion.h2 
-                    className="text-4xl md:text-5xl font-bold text-white mb-4"
-                    initial={{opacity: 0, y: 20}}
-                    whileInView={{opacity: 1, y: 0}}
-                    viewport={{ once: true, amount: 0.8 }}
-                    transition={{duration: 0.6}}
-                  >
-                    One Integration, Global Coverage
-                  </motion.h2>
-                  <motion.p 
-                    className="text-lg text-gray-400"
-                    initial={{opacity: 0, y: 20}}
-                    whileInView={{opacity: 1, y: 0}}
-                    viewport={{ once: true, amount: 0.8 }}
-                    transition={{duration: 0.6, delay: 0.1}}
-                  >
-                    Access the entire Web3 ecosystem with our unified API. Simplify your stack and scale faster with Synthara's robust infrastructure.
-                  </motion.p>
-                </div>
-                <div className="grid md:grid-cols-3 gap-8">
-                  <motion.div 
-                    className="p-8 rounded-2xl border border-gray-800 bg-gray-900/40 hover:border-indigo-500/50 hover:-translate-y-1 transition-all duration-300"
-                    initial={{opacity: 0, y: 20}}
-                    whileInView={{opacity: 1, y: 0}}
-                    viewport={{ once: true, amount: 0.5 }}
-                    transition={{duration: 0.5, delay: 0.2}}
-                  >
-                    <h3 className="text-2xl font-bold text-white mb-3">Global On-Ramps</h3>
-                    <p className="text-gray-400">Enable users in 150+ countries to buy crypto with their local payment methods.</p>
-                  </motion.div>
-                  <motion.div 
-                    className="p-8 rounded-2xl border border-gray-800 bg-gray-900/40 hover:border-indigo-500/50 hover:-translate-y-1 transition-all duration-300"
-                    initial={{opacity: 0, y: 20}}
-                    whileInView={{opacity: 1, y: 0}}
-                    viewport={{ once: true, amount: 0.5 }}
-                    transition={{duration: 0.5, delay: 0.3}}
-                  >
-                    <h3 className="text-2xl font-bold text-white mb-3">Effortless Off-Ramps</h3>
-                    <p className="text-gray-400">Allow users to seamlessly convert crypto back to fiat, directly to their bank accounts.</p>
-                  </motion.div>
-                  <motion.div 
-                    className="p-8 rounded-2xl border border-gray-800 bg-gray-900/40 hover:border-indigo-500/50 hover:-translate-y-1 transition-all duration-300"
-                    initial={{opacity: 0, y: 20}}
-                    whileInView={{opacity: 1, y: 0}}
-                    viewport={{ once: true, amount: 0.5 }}
-                    transition={{duration: 0.5, delay: 0.4}}
-                  >
-                    <h3 className="text-2xl font-bold text-white mb-3">NFT Checkout</h3>
-                    <p className="text-gray-400">The simplest way for anyone to purchase an NFT with just a credit card, no crypto needed.</p>
-                  </motion.div>
-                </div>
-              </div>
-            </section>
-
-            {/* CTA Section */}
-            <section className="py-20">
-              <div className="container mx-auto px-6 text-center">
-                <motion.div 
-                  className="max-w-3xl mx-auto"
-                  initial={{opacity: 0, y: 20}}
-                  whileInView={{opacity: 1, y: 0}}
-                  viewport={{ once: true, amount: 0.8 }}
-                  transition={{duration: 0.8}}
-                >
-                  <h2 className="text-4xl md:text-5xl font-bold text-white mb-5">Ready to Build the Future?</h2>
-                  <p className="text-lg text-gray-400 mb-8">
-                    Join hundreds of businesses building on Synthara. Create an account to start integrating or contact our sales team for a custom solution.
+                  <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+                    For Every Stage of Your Product's Journey
+                  </h2>
+                  <p className="text-xl text-gray-600">
+                    Chanakya provides tailored toolkits, whether you're a new startup with an idea or an established product looking to optimize.
                   </p>
-                  <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-10 rounded-lg transition text-xl">
-                    Start Building Now
-                  </button>
-                </motion.div>
+                </div>
+                <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                  <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden">
+                    <div className="absolute top-6 right-6 w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                    </div>
+                    <div className="mb-8">
+                      <h3 className="text-3xl font-bold mb-3">For Startups</h3>
+                      <p className="text-gray-600 text-lg">From idea to launch with an AI co-pilot guiding you.</p>
+                    </div>
+                    <div className="bg-gray-50 p-6 rounded-2xl space-y-3">
+                        <p className="font-semibold text-gray-800">✓ AI-Assisted Website Builder</p>
+                        <p className="font-semibold text-gray-800">✓ AI Chatbot for Basic Legal Guidance</p>
+                        <p className="font-semibold text-gray-800">✓ Financial & Funding Strategy</p>
+                        <p className="font-semibold text-gray-800">✓ SEO and Social Media Content</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden">
+                    <div className="absolute top-6 right-6 w-12 h-12 bg-black rounded-full flex items-center justify-center">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                      </svg>
+                    </div>
+                    <div className="mb-8">
+                      <h3 className="text-3xl font-bold mb-3">For Established Products</h3>
+                      <p className="text-gray-600 text-lg">Analyze, optimize, and enhance your existing product.</p>
+                    </div>
+                    <div className="bg-gray-50 p-6 rounded-2xl space-y-3">
+                      <p className="font-semibold text-gray-800">✓ In-depth UI/UX Analysis</p>
+                      <p className="font-semibold text-gray-800">✓ Continuous SEO Recommendations</p>
+                      <p className="font-semibold text-gray-800">✓ User Engagement & Trend Analytics</p>
+                      <p className="font-semibold text-gray-800">✓ Feature Enhancement Suggestions</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </section>
-          </main>
 
-          {/* Footer */}
-          <footer className="border-t border-gray-800 mt-20">
-            <div className="container mx-auto px-6 py-12">
-              <div className="grid md:grid-cols-4 gap-8">
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-4">Synthara</h4>
-                  <p className="text-gray-400">The complete Web3 infrastructure for global access.</p>
-                </div>
-                <div>
-                  <h5 className="font-semibold text-white mb-4">Products</h5>
-                  <ul className="space-y-2 text-gray-400">
-                    <li><a href="#" className="hover:text-white transition">On-ramps</a></li>
-                    <li><a href="#" className="hover:text-white transition">Off-ramps</a></li>
-                    <li><a href="#" className="hover:text-white transition">NFT Checkout</a></li>
-                    <li><a href="#" className="hover:text-white transition">Pricing</a></li>
-                  </ul>
-                </div>
-                <div>
-                  <h5 className="font-semibold text-white mb-4">Developers</h5>
-                  <ul className="space-y-2 text-gray-400">
-                    <li><a href="#" className="hover:text-white transition">Documentation</a></li>
-                    <li><a href="#" className="hover:text-white transition">API Reference</a></li>
-                    <li><a href="#" className="hover:text-white transition">Status</a></li>
-                  </ul>
-                </div>
-                <div>
-                  <h5 className="font-semibold text-white mb-4">Company</h5>
-                  <ul className="space-y-2 text-gray-400">
-                    <li><a href="#" className="hover:text-white transition">About Us</a></li>
-                    <li><a href="#" className="hover:text-white transition">Careers</a></li>
-                    <li><a href="#" className="hover:text-white transition">Contact</a></li>
-                  </ul>
+            <section className="py-20 bg-white relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-1/2 h-full">
+                <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
+                  <ambientLight intensity={0.6} />
+                  <pointLight position={[5, 5, 5]} intensity={1} />
+                  <Suspense fallback={null}>
+                    <FloatingElement position={[2, 1, 0]} color="#3b82f6" scale={1.2} shape="sphere" />
+                    <FloatingElement position={[0, -1, -1]} color="#1e40af" scale={0.8} shape="torus" />
+                    <FloatingElement position={[-1, 2, 1]} color="#60a5fa" scale={1} shape="cylinder" />
+                  </Suspense>
+                </Canvas>
+              </div>
+              <div className="container mx-auto px-6 relative z-10">
+                <div className="max-w-2xl">
+                  <motion.h2
+                    className="text-6xl md:text-7xl font-bold leading-tight mb-8"
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8 }}
+                  >
+                    Leverage a Multi-Agent AI System
+                  </motion.h2>
+                  <motion.p
+                    className="text-xl text-gray-600 mb-8"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
+                  >
+                    Get personalized recommendations from a team of specialized AI agents. Our system even facilitates interactive debates on features, presenting you with transparent pros and cons.
+                  </motion.p>
+                  <motion.button
+                    className="bg-black hover:bg-gray-800 text-white font-medium py-3 px-8 rounded-full transition text-lg"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, delay: 0.4 }}
+                  >
+                    Explore Our AI Features
+                  </motion.button>
                 </div>
               </div>
-              <div className="mt-12 pt-8 border-t border-gray-800 text-center text-gray-500">
-                &copy; {new Date().getFullYear()} Synthara. All rights reserved.
+            </section>
+
+            <section className="py-20">
+          <div className="container mx-auto px-6">
+            <div className="grid lg:grid-cols-12 gap-6 max-w-7xl mx-auto">
+              {/* Left content - spans 5 columns */}
+              <div className="lg:col-span-5 flex flex-col justify-center">
+                <h2 className="text-5xl md:text-6xl font-bold leading-tight mb-8 bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                  Core Tools to Drive Growth
+                </h2>
+                <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                  Chanakya puts a powerful suite of analysis and product management tools at your fingertips, helping
+                  you identify market gaps and track your refinement iterations seamlessly.
+                </p>
+                <button className="bg-black hover:bg-gray-800 text-white font-medium py-3 px-8 rounded-full transition-all duration-300 hover:scale-105 w-fit">
+                  See Pricing Plans
+                </button>
+              </div>
+
+              {/* Bento grid - spans 7 columns */}
+              <div className="lg:col-span-7 grid grid-cols-6 grid-rows-4 gap-4 h-[600px]">
+                {/* Large feature card */}
+                <div className="col-span-6 row-span-2 backdrop-blur-xl bg-gradient-to-br from-blue-500/90 to-purple-600/90 p-8 rounded-3xl border border-white/20 shadow-2xl relative overflow-hidden group  transition-all duration-500">
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
+                  <div className="relative z-10">
+                    <h3 className="text-3xl font-bold mb-4 text-white">Competitor & Market Analysis</h3>
+                    <p className="text-white/90 text-lg leading-relaxed">
+                      Visualize competitor performance and identify strategic market gaps with AI-driven insights and
+                      real-time data visualization.
+                    </p>
+                  </div>
+                  <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+                  <div className="absolute top-4 right-4 w-16 h-16 bg-white/20 rounded-2xl backdrop-blur-sm"></div>
+                </div>
+
+                {/* Medium card - Investor Matching */}
+                <div className="col-span-4 row-span-2 backdrop-blur-xl bg-white/40 p-6 rounded-3xl border border-white/30 shadow-xl hover:bg-white/50 transition-all duration-500  relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                  <div className="relative z-10">
+                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl mb-4 flex items-center justify-center">
+                      <div className="w-6 h-6 bg-white rounded-lg"></div>
+                    </div>
+                    <h3 className="text-2xl font-bold mb-3 text-gray-900">Investor Matching</h3>
+                    <span className="inline-block px-3 py-1 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-semibold rounded-full mb-3">
+                      Premium
+                    </span>
+                    <p className="text-gray-700 leading-relaxed">
+                      Access a curated database of investors with detailed insights on their interests and past deals.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Small accent card */}
+                <div className="col-span-2 row-span-2 backdrop-blur-xl bg-gradient-to-br from-rose-400/80 to-pink-500/80 p-4 rounded-3xl border border-white/20 shadow-xl transition-all duration-500 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                  <div className="relative z-10 h-full flex flex-col justify-center items-center text-center">
+                    <div className="w-16 h-16 bg-white/30 rounded-2xl backdrop-blur-sm mb-4 flex items-center justify-center">
+                      <div className="w-8 h-8 bg-white rounded-xl"></div>
+                    </div>
+                    <h4 className="text-white font-bold text-lg">AI Insights</h4>
+                    <p className="text-white/90 text-sm mt-2">Smart analytics</p>
+                  </div>
+                </div>
+
+                {/* Bottom wide card */}
+                <div className="col-span-6 row-span-1 backdrop-blur-xl bg-white/30 p-6 rounded-3xl border border-white/30 shadow-xl hover:bg-white/40 transition-all duration-500  relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"></div>
+                  <div className="relative z-10 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-2xl font-bold mb-2 text-gray-900">Product Refinement & Version Tracking</h3>
+                      <p className="text-gray-700">
+                        Maintain a comprehensive history of requirements and analyze the impact of changes on cost and
+                        satisfaction metrics.
+                      </p>
+                    </div>
+                    <div className="hidden md:flex space-x-2">
+                      <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                      <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                      <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </footer>
+          </div>
+        </section>
+
+            <footer className="bg-white py-20 border-t border-gray-100">
+              <div className="container mx-auto px-6">
+                <div className="grid md:grid-cols-5 gap-8 mb-16">
+                  <div>
+                    <div className="text-2xl font-bold mb-6">Chanakya</div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-4">Features</h4>
+                    <ul className="space-y-3 text-gray-600">
+                      <li><a href="#" className="hover:text-black transition">AI Assistance</a></li>
+                      <li><a href="#" className="hover:text-black transition">Website & SEO Tools</a></li>
+                      <li><a href="#" className="hover:text-black transition">Investor Matching</a></li>
+                      <li><a href="#" className="hover:text-black transition">Market Analysis</a></li>
+                      <li><a href="#" className="hover:text-black transition">Version Tracking</a></li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-4">Resources</h4>
+                    <ul className="space-y-3 text-gray-600">
+                      <li><a href="#" className="hover:text-black transition">Docs</a></li>
+                      <li><a href="#" className="hover:text-black transition">Knowledge Base</a></li>
+                      <li><a href="#" className="hover:text-black transition">Blog</a></li>
+                      <li><a href="#" className="hover:text-black transition">Case Studies</a></li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-4">Company</h4>
+                    <ul className="space-y-3 text-gray-600">
+                      <li><a href="#" className="hover:text-black transition">About Us</a></li>
+                      <li><a href="#" className="hover:text-black transition">Careers</a></li>
+                      <li><a href="#" className="hover:text-black transition">Get Support</a></li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-4">Connect</h4>
+                    <ul className="space-y-3 text-gray-600">
+                      <li><a href="#" className="hover:text-black transition">LinkedIn</a></li>
+                      <li><a href="#" className="hover:text-black transition">X / Twitter</a></li>
+                      <li><a href="#" className="hover:text-black transition">Contact Sales</a></li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between pt-8 border-t border-gray-100">
+                  <div className="text-4xl font-bold">Chanakya</div>
+                  <div className="flex items-center space-x-3">
+                    <span className="text-gray-600">© 2025 Chanakya Inc.</span>
+                  </div>
+                </div>
+              </div>
+            </footer>
+          </main>
         </motion.div>
       </div>
     </>
-  );
+  )
 }
