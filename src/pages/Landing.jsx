@@ -4,6 +4,8 @@ import { useRef, Suspense, useState, useLayoutEffect } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { motion, useScroll, useTransform, useSpring } from "framer-motion"
 import * as THREE from "three"
+import bento1 from '../assets/Bento1.jpeg'
+import bento2 from '../assets/Bento2.jpeg'
 
 const FloatingElement = ({ position, rotation, scale = 1, color, shape = "sphere" }) => {
   const meshRef = useRef()
@@ -253,7 +255,7 @@ export default function App() {
                   </Suspense>
                 </Canvas>
               </div>
-              <div className="container mx-auto px-6 relative z-10">
+              <div className="container mx-auto px-20 relative z-10">
                 <div className="max-w-2xl">
                   <motion.h2
                     className="text-6xl md:text-7xl font-bold leading-tight mb-8"
@@ -303,124 +305,256 @@ export default function App() {
                 </button>
               </div>
 
-              {/* Bento grid - spans 7 columns */}
-              <div className="lg:col-span-7 grid grid-cols-6 grid-rows-4 gap-4 h-[600px]">
-                {/* Large feature card */}
-                <div className="col-span-6 row-span-2 backdrop-blur-xl bg-gradient-to-br from-blue-500/90 to-purple-600/90 p-8 rounded-3xl border border-white/20 shadow-2xl relative overflow-hidden group  transition-all duration-500">
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-                  <div className="relative z-10">
-                    <h3 className="text-3xl font-bold mb-4 text-white">Competitor & Market Analysis</h3>
-                    <p className="text-white/90 text-lg leading-relaxed">
-                      Visualize competitor performance and identify strategic market gaps with AI-driven insights and
-                      real-time data visualization.
-                    </p>
-                  </div>
-                  <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
-                  <div className="absolute top-4 right-4 w-16 h-16 bg-white/20 rounded-2xl backdrop-blur-sm"></div>
-                </div>
+              <div className="lg:col-span-7">
+                <div className="backdrop-blur-2xl bg-white/10 p-8 rounded-3xl border border-white/20 shadow-xl">
+                  <div className="grid grid-cols-4 gap-4 h-[480px]">
+                    {/* Main feature card - elegant dark theme */}
+                    <div className="col-span-2 row-span-2 backdrop-blur-xl  transition-all duration-500">
 
-                {/* Medium card - Investor Matching */}
-                <div className="col-span-4 row-span-2 backdrop-blur-xl bg-white/40 p-6 rounded-3xl border border-white/30 shadow-xl hover:bg-white/50 transition-all duration-500  relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
-                  <div className="relative z-10">
-                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl mb-4 flex items-center justify-center">
-                      <div className="w-6 h-6 bg-white rounded-lg"></div>
-                    </div>
-                    <h3 className="text-2xl font-bold mb-3 text-gray-900">Investor Matching</h3>
-                    <span className="inline-block px-3 py-1 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-semibold rounded-full mb-3">
-                      Premium
-                    </span>
-                    <p className="text-gray-700 leading-relaxed">
-                      Access a curated database of investors with detailed insights on their interests and past deals.
-                    </p>
-                  </div>
-                </div>
+                      <div className="relative z-10">
+                        <div className="text-xs text-black font-medium mb-6 tracking-wider">FEATURED</div>
+                        <h3 className="text-2xl font-bold text-black mb-6 leading-tight">
+                          Advanced Analytics
+                          <br />
+                          <span className="text-slate-800">for Growth</span>
+                        </h3>
+                        <h5>Stop guessing and start making decisions with confidence. Chanakya’s advanced analytics engine transforms raw user data into a clear roadmap for growth.</h5>
 
-                {/* Small accent card */}
-                <div className="col-span-2 row-span-2 backdrop-blur-xl bg-gradient-to-br from-rose-400/80 to-pink-500/80 p-4 rounded-3xl border border-white/20 shadow-xl transition-all duration-500 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
-                  <div className="relative z-10 h-full flex flex-col justify-center items-center text-center">
-                    <div className="w-16 h-16 bg-white/30 rounded-2xl backdrop-blur-sm mb-4 flex items-center justify-center">
-                      <div className="w-8 h-8 bg-white rounded-xl"></div>
-                    </div>
-                    <h4 className="text-white font-bold text-lg">AI Insights</h4>
-                    <p className="text-white/90 text-sm mt-2">Smart analytics</p>
-                  </div>
-                </div>
+                        <img src={bento1} alt="" className="fixed h-60 w-70 mt-5 rounded-2xl" />
 
-                {/* Bottom wide card */}
-                <div className="col-span-6 row-span-1 backdrop-blur-xl bg-white/30 p-6 rounded-3xl border border-white/30 shadow-xl hover:bg-white/40 transition-all duration-500  relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"></div>
-                  <div className="relative z-10 flex items-center justify-between">
-                    <div>
-                      <h3 className="text-2xl font-bold mb-2 text-gray-900">Product Refinement & Version Tracking</h3>
-                      <p className="text-gray-700">
-                        Maintain a comprehensive history of requirements and analyze the impact of changes on cost and
-                        satisfaction metrics.
-                      </p>
+
+                      </div>
                     </div>
-                    <div className="hidden md:flex space-x-2">
-                      <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                      <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                      <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+
+                    {/* Blog card - clean and minimal */}
+                    <div className="col-span-2 backdrop-blur-xl border-blue-500 border-2 p-4 rounded-2xl transition-all duration-300">
+                      <div className="text-xs text-slate-600 font-medium mb-3 tracking-wider">INSIGHTS</div>
+                      <h3 className="text-lg font-semibold text-slate-900 mb-4">Latest Updates</h3>
+                      <h5>Dive into our collection of articles, case studies, and data-driven analyses designed to help you navigate the complexities of product development.</h5>
+                      <div className="absolute top-4 right-4 w-6 h-6 backdrop-blur-sm bg-slate-100/50 rounded-lg flex items-center justify-center">
+                        <svg className="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                          />
+                        </svg>
+                      </div>
                     </div>
+
+                    {/* About card - subtle blue accent */}
+                    <a href="/about" className="backdrop-blur-xl bg-gradient-to-br from-blue-400/80 to-blue-200/60 p-5 rounded-2xl border border-blue-200/50 relative overflow-hidden  transition-all duration-300">
+                      <div className="text-xs text-black font-medium mb-2 tracking-wider">ABOUT US</div>
+                      <h3 className="text-base font-semibold text-black">We're Building the Co-pilot for Product Visionaries</h3>
+                      <div className="absolute top-3 right-3 w-5 h-5 rounded-lg flex items-center justify-center">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      </div>
+                    </a>
+
+                    {/* Contact card - subtle blue accent */}
+                    <a href="/contact" className="backdrop-blur-xl  p-5 rounded-2xl border-black border-2 bg-black transition-all duration-300 ">
+                      <div className="text-xs text-white font-medium mb-2 tracking-wider">SUPPORT</div>
+                      <h3 className="text-base font-semibold text-white">World-Class Support, Every Step of the Way</h3>
+                      <div className="absolute top-3 right-3 w-5 h-5 rounded-lg flex items-center justify-center">
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      </div>
+                      
+                    </a>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
-
-            <footer className="bg-white py-20 border-t border-gray-100">
+        <section className="py-20 bg-gray-50">
               <div className="container mx-auto px-6">
-                <div className="grid md:grid-cols-5 gap-8 mb-16">
-                  <div>
-                    <div className="text-2xl font-bold mb-6">Chanakya</div>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-4">Features</h4>
-                    <ul className="space-y-3 text-gray-600">
-                      <li><a href="#" className="hover:text-black transition">AI Assistance</a></li>
-                      <li><a href="#" className="hover:text-black transition">Website & SEO Tools</a></li>
-                      <li><a href="#" className="hover:text-black transition">Investor Matching</a></li>
-                      <li><a href="#" className="hover:text-black transition">Market Analysis</a></li>
-                      <li><a href="#" className="hover:text-black transition">Version Tracking</a></li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-4">Resources</h4>
-                    <ul className="space-y-3 text-gray-600">
-                      <li><a href="#" className="hover:text-black transition">Docs</a></li>
-                      <li><a href="#" className="hover:text-black transition">Knowledge Base</a></li>
-                      <li><a href="#" className="hover:text-black transition">Blog</a></li>
-                      <li><a href="#" className="hover:text-black transition">Case Studies</a></li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-4">Company</h4>
-                    <ul className="space-y-3 text-gray-600">
-                      <li><a href="#" className="hover:text-black transition">About Us</a></li>
-                      <li><a href="#" className="hover:text-black transition">Careers</a></li>
-                      <li><a href="#" className="hover:text-black transition">Get Support</a></li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-4">Connect</h4>
-                    <ul className="space-y-3 text-gray-600">
-                      <li><a href="#" className="hover:text-black transition">LinkedIn</a></li>
-                      <li><a href="#" className="hover:text-black transition">X / Twitter</a></li>
-                      <li><a href="#" className="hover:text-black transition">Contact Sales</a></li>
-                    </ul>
-                  </div>
+                <div className="text-center max-w-3xl mx-auto mb-16">
+                  <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+                    Get Started in 3 Simple Steps
+                  </h2>
+                  <p className="text-xl text-gray-600">
+                    Synthara simplifies complexity. Our streamlined process gets you from data input to actionable insights in minutes.
+                  </p>
                 </div>
-                <div className="flex items-center justify-between pt-8 border-t border-gray-100">
-                  <div className="text-4xl font-bold">Chanakya</div>
-                  <div className="flex items-center space-x-3">
-                    <span className="text-gray-600">© 2025 Chanakya Inc.</span>
-                  </div>
+                <div className="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto">
+                  {/* Step 1 */}
+                  <motion.div 
+                    className="text-center"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.1 }}
+                  >
+                    <div className="w-20 h-20 bg-white shadow-md rounded-full flex items-center justify-center mx-auto mb-6 border border-gray-100">
+                      <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                    </div>
+                    <h3 className="text-2xl font-bold mb-3">1. Connect Your Data</h3>
+                    <p className="text-gray-600">Securely link your existing product data, analytics platforms, or simply describe your startup idea. Our system handles the rest.</p>
+                  </motion.div>
+                  {/* Step 2 */}
+                  <motion.div 
+                    className="text-center"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                  >
+                    <div className="w-20 h-20 bg-white shadow-md rounded-full flex items-center justify-center mx-auto mb-6 border border-gray-100">
+                       <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                    </div>
+                    <h3 className="text-2xl font-bold mb-3">2. AI Analyzes & Debates</h3>
+                    <p className="text-gray-600">Our multi-agent AI system processes your information, identifies opportunities, and simulates debates to provide you with balanced, transparent recommendations.</p>
+                  </motion.div>
+                  {/* Step 3 */}
+                  <motion.div 
+                    className="text-center"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
+                  >
+                    <div className="w-20 h-20 bg-white shadow-md rounded-full flex items-center justify-center mx-auto mb-6 border border-gray-100">
+                      <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
+                    </div>
+                    <h3 className="text-2xl font-bold mb-3">3. Receive Actionable Insights</h3>
+                    <p className="text-gray-600">Get a clear, prioritized roadmap for growth. From UI tweaks to strategic market positioning, receive insights you can implement immediately.</p>
+                  </motion.div>
                 </div>
               </div>
-            </footer>
+            </section>
+
+            
+
+            {/* =============================================================== */}
+            {/* =================== NEW SECTION: TRUSTED BY =================== */}
+            {/* =============================================================== */}
+            <section className="py-20 bg-white">
+              <div className="container mx-auto px-6 text-center">
+                <h2 className="text-3xl font-bold text-gray-800 mb-12">
+                  Trusted by the Next Generation of Innovators
+                </h2>
+                <div className="flex flex-wrap items-center justify-center gap-x-16 gap-y-8">
+                  <div className="text-3xl font-medium text-gray-400 grayscale hover:grayscale-0 transition-all">Nexus</div>
+                  <div className="text-3xl font-medium text-gray-400 grayscale hover:grayscale-0 transition-all">Apex Labs</div>
+                  <div className="text-3xl font-medium text-gray-400 grayscale hover:grayscale-0 transition-all">Momentum</div>
+                  <div className="text-3xl font-medium text-gray-400 grayscale hover:grayscale-0 transition-all">QuantumLeap</div>
+                  <div className="text-3xl font-medium text-gray-400 grayscale hover:grayscale-0 transition-all">Catalyst</div>
+                </div>
+              </div>
+            </section>
+
+            
+
+            <footer className="bg-white border-t border-gray-100 relative overflow-hidden">
+      <div className="container mx-auto px-6 py-52 relative z-10">
+        <div className="flex justify-center">
+          <div className="grid md:grid-cols-4 gap-8 max-w-4xl w-full text-center md:text-left">
+            <div>
+              <h4 className="font-semibold mb-4">Features</h4>
+              <ul className="space-y-3 text-gray-600">
+                <li>
+                  <a href="#" className="hover:text-black transition">
+                    AI Assistance
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-black transition">
+                    Website & SEO Tools
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-black transition">
+                    Investor Matching
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-black transition">
+                    Market Analysis
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-black transition">
+                    Version Tracking
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Resources</h4>
+              <ul className="space-y-3 text-gray-600">
+                <li>
+                  <a href="#" className="hover:text-black transition">
+                    Docs
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-black transition">
+                    Knowledge Base
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-black transition">
+                    Blog
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-black transition">
+                    Case Studies
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Company</h4>
+              <ul className="space-y-3 text-gray-600">
+                <li>
+                  <a href="#" className="hover:text-black transition">
+                    About Us
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-black transition">
+                    Careers
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-black transition">
+                    Get Support
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Connect</h4>
+              <ul className="space-y-3 text-gray-600">
+                <li>
+                  <a href="#" className="hover:text-black transition">
+                    LinkedIn
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-black transition">
+                    X / Twitter
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-black transition">
+                    Contact Sales
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute inset-0 flex items-end justify-center pointer-events-none pb-4">
+        <div className="text-[8rem] md:text-[12rem] lg:text-[16rem] font-bold text-gray-200 whitespace-nowrap leading-none opacity-60">
+          Chanakya
+        </div>
+      </div>
+    </footer>
           </main>
         </motion.div>
       </div>
